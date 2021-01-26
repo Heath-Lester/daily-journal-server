@@ -1,6 +1,7 @@
 
 import sqlite3
 from models import Entry
+from models import Mood
 import json
 
 
@@ -13,23 +14,32 @@ def get_all_entries():
 
         db_cursor.execute("""
         SELECT
+            e.id,
             e.datetime,
             e.content,
             e.tag,
             e.mood,
-            e.id
+            m.name
         FROM entry e
+        JOIN Mood m
+            ON m.id = e.mood
         """)
 
         entries = []
         dataset = db_cursor.fetchall()
 
         for row in dataset:
-            entry = Entry(row['datetime'],
+
+            entry = Entry(row['id'],
+                          row['datetime'],
                           row['content'], 
                           row['tag'], 
-                          row['mood'],
-                          row['id'])
+                          row['mood'])
+
+            mood = Mood(row['id'],
+                        row['name'])
+
+            entry.mood = mood.__dict__
 
             entries.append(entry.__dict__)
 
@@ -45,22 +55,22 @@ def get_single_entry(id):
 
         db_cursor.execute("""
         SELECT
+            e.id,
             e.datetime,
             e.content,
             e.tag,
-            e.mood,
-            e.id
+            e.mood
         FROM entry e
         WHERE e.id = ?
         """, (id, ))
 
         data = db_cursor.fetchone()
 
-        entry = Entry(data['datetime'],
+        entry = Entry(data['id'],
+                      data['datetime'],
                       data['content'], 
                       data['tag'], 
-                      data['mood'],
-                      data['id'])
+                      data['mood'])
 
         return json.dumps(entry.__dict__)
 
@@ -83,11 +93,11 @@ def search_entries(searchTerm):
 
         db_cursor.execute("""
         SELECT
+            e.id,
             e.datetime,
             e.content,
             e.tag,
-            e.mood,
-            e.id
+            e.mood
         FROM entry e
         WHERE e.content LIKE = ?
         """, ("% + searchTerm + %", ) )
@@ -96,11 +106,11 @@ def search_entries(searchTerm):
         dataset = db_cursor.fetchall()
 
         for row in dataset:
-            entry = Entry(row['datetime'],
+            entry = Entry(row['id'],
+                          row['datetime'],
                           row['content'], 
                           row['tag'], 
-                          row['mood'],
-                          row['id'])
+                          row['mood'])
 
             filtered_entries.append(entry.__dict__)
 
