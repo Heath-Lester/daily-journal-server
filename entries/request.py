@@ -1,5 +1,6 @@
 
 import sqlite3
+from models import Entry
 import json
 
 
@@ -55,11 +56,11 @@ def get_single_entry(id):
 
         data = db_cursor.fetchone()
 
-        entry = entry(row['datetime'],
-                      row['content'], 
-                      row['tag'], 
-                      row['mood'],
-                      row['id'])
+        entry = Entry(data['datetime'],
+                      data['content'], 
+                      data['tag'], 
+                      data['mood'],
+                      data['id'])
 
         return json.dumps(entry.__dict__)
 
@@ -73,3 +74,34 @@ def delete_entry(id):
         DELETE FROM entry
         WHERE id = ?
         """, (id, ))
+
+
+def search_entries(searchTerm):
+
+    with sqlite3.connect("./dailyjournal.db") as conn:
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        SELECT
+            e.datetime,
+            e.content,
+            e.tag,
+            e.mood,
+            e.id
+        FROM entry e
+        WHERE e.content LIKE = ?
+        """, ("% + searchTerm + %", ) )
+
+        filtered_entries = []
+        dataset = db_cursor.fetchall()
+
+        for row in dataset:
+            entry = Entry(row['datetime'],
+                          row['content'], 
+                          row['tag'], 
+                          row['mood'],
+                          row['id'])
+
+            filtered_entries.append(entry.__dict__)
+
+    return json.dumps(filtered_entries)
