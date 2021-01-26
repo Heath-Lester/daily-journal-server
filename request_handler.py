@@ -1,6 +1,6 @@
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from entries import get_all_entries, get_single_entry
+from entries import get_all_entries, get_single_entry, delete_entry
 import json
 
 
@@ -97,15 +97,15 @@ class HandleRequests(BaseHTTPRequestHandler):
     #         self.wfile.write(f"{new_entry}".encode())
 
 
-    # def do_DELETE(self):
-    #     self._set_headers(204)
+    def do_DELETE(self):
+        self._set_headers(204)
 
-    #     (resource, id) = self.parse_url(self.path)
+        (resource, id) = self.parse_url(self.path)
 
-    #     if resource == "entries":
-    #         delete_entry(id)
+        if resource == "entries":
+            delete_entry(id)
 
-    #     self.wfile.write("".encode())
+        self.wfile.write("".encode())
 
 
     # def do_PUT(self):
