@@ -59,8 +59,11 @@ def get_single_entry(id):
             e.datetime,
             e.content,
             e.tag,
-            e.mood
+            e.mood,
+            m.name
         FROM entry e
+        JOIN Mood m
+            ON m.id = e.mood
         WHERE e.id = ?
         """, (id, ))
 
@@ -71,6 +74,11 @@ def get_single_entry(id):
                       data['content'], 
                       data['tag'], 
                       data['mood'])
+                      
+        mood = Mood(data['mood'],
+                    data['name'])
+
+        entry.mood = mood.__dict__
 
         return json.dumps(entry.__dict__)
 
