@@ -1,6 +1,6 @@
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from entries import get_all_entries, get_single_entry, delete_entry
+from entries import get_all_entries, get_single_entry, delete_entry, search_entries
 import json
 
 
@@ -66,14 +66,14 @@ class HandleRequests(BaseHTTPRequestHandler):
                     response = f"{get_all_entries()}"
 
 
-        # elif len(parsed) == 3:
-        #     ( resource, key, value ) = parsed
+        elif len(parsed) == 3:
+            ( resource, key, value ) = parsed
 
-        #     if key == "email" and resource == "customers":
-        #         response = get_customers_by_email(value)
+            if key == "q" and resource == "entries":
+                response = search_entries(value)
             
-        #     elif key == "treatment" and resource == "animals":
-        #         response = get_animals_by_treatment(value)
+            # elif key == "treatment" and resource == "animals":
+            #     response = get_animals_by_treatment(value)
 
 
         self.wfile.write(response.encode())
